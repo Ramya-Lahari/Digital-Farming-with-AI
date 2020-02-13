@@ -1,0 +1,104 @@
+#Importing Base Overlay
+frompynq.overlays.base import BaseOverlay
+base = BaseOverlay("base.bit")
+
+#Reading the sensor outputs using Arduino Shield Connector Analog pins
+#Analog pins A1-Soil Moisture sensor FC-28
+#Analog pins A2-Rain fall sensor FC-37
+#Analog pins A3-Temperature and Humidity LM-22
+#importing Arduino Grove pins
+frompynq.lib.arduino import Arduino_Analog
+frompynq.lib.arduino import ARDUINO_GROVE_A1
+frompynq.lib.arduino import ARDUINO_GROVE_A2
+frompynq.lib.arduino import ARDUINO_GROVE_A3
+
+analog1 = Arduino_Analog(base.ARDUINO,ARDUINO_GROVE_A1)
+analog2 = Arduino_Analog(base.ARDUINO,ARDUINO_GROVE_A2)
+analog3 = Arduino_Analog(base.ARDUINO,ARDUINO_GROVE_A3)
+
+#Reading the analog outputs of sensor
+analog1.read()
+analog2.read()
+analog3.read()
+
+#converting Analog outputs to Digital values using XADC
+analog1.read_raw()[0]
+analog2.read_raw()[0]
+analog3.read_raw()[0]
+
+#storing the Digital values in list
+list1=[analog1.read_raw()[0],analog2.read_raw()[0],analog3.read_raw()[0]]
+
+
+
+
+
+#1-soil moisture,2-rainfall,3-humidity and temperature
+print (list1[0])
+print(list1[1])
+print(list1[2])
+
+#comparing the digital outputs of sensors with threshold values
+if (list1[0] > 165):
+print('low soil moisture')
+
+else :
+print('high soil moisture')
+
+
+if (list1[1] >=5750):
+print('not raining')
+
+else :
+print('it is raining')
+if (list1[2] >=279):
+print('moderate temperature')
+print('moderate humidity')
+
+
+else :
+print('moderate temperature')
+print('moderate humidity')
+
+
+
+#importing Arduino_IO from library files for sending Status signals to Arduino
+frompynq.lib.arduino import Arduino_IO
+#InitialisingArduino Digital IO pins as outputs
+#Used Arduino Digital IO pins AR1,AR2,AR3
+output1=Arduino_IO(base.ARDUINO,1,'out')
+output2=Arduino_IO(base.ARDUINO,2,'out')
+output3=Arduino_IO(base.ARDUINO,3,'out')
+
+#Comparing the outputs with thresholds and writing 1 or 0 to status signals (Digital IO pins)
+if (list1[0] > 165):
+print('low soil moisture')
+output1.write(0)
+
+else :
+print('high soil moisture')
+output1.write(1)
+
+if (list1[1] >=5750):
+print('not raining')
+output2.write(0)
+else :
+print('it is raining')
+output2.write(1)
+if (list1[2] >=279):
+print('moderate temperature')
+print('moderate humidity')
+output3.write(0)
+
+
+else :
+print('immoderate temperature')
+print('immoderate humidity')
+output3.write(1)
+
+#Capturing image using USB web camera
+
+from PIL import Image as PIL_Image
+orig_img_path = '/home//home/siva/Documents/PlantDiseaseDetection-master/PlantDiseaseDetection-master.jpg'
+!f webcam  --no-banner --save {orig_img_path} -d /dev/video0 2> /dev/null
+
